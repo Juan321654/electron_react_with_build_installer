@@ -1,3 +1,6 @@
+`master` branch status: working
+`server` branch status: not working (cors error)
+
 1. npx create-react-app <your_app_name>
 2. npm i cross-env electron-is-dev
 3. npm i -D concurrently electron electron-builder wait-on
