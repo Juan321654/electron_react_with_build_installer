@@ -1,27 +1,23 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Tray, Menu } = require("electron");
 const path = require("path");
 const isDev = require("electron-is-dev");
 const { exec } = require("child_process");
+const iconPath = path.join(__dirname, "../server/icon.png");
 
 let mainWindow;
+let secondWindow;
+let tray = null;
 
-function createWindow() {
+function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
     height: 680,
     title: "Electron build test",
     webPreferences: {
-      show: false,
       nodeIntegration: true,
       enableRemoteModule: true,
-      preload: path.join(__dirname, "preload.js"),
       // ctrl + shift + i to open dev tools
       devTools: true,
-      webSecurity: false,
-      originWhitelist: ["*"],
-      disableBlinkFeatures: "OutOfBlinkCors",
-      sandbox: false,
-      allowRunningInsecureContent: true,
     },
   });
 
@@ -31,31 +27,54 @@ function createWindow() {
       : `file://${path.join(__dirname, "../build/index.html")}`
   );
 
-  mainWindow.webContents.session.on(
-    "preconnect",
-    (event, preconnectUrl, allowCredentials) => {
-      event.preventDefault();
-      allowCredentials = true;
-      preconnectUrl = "http://localhost:3007/hello";
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.show();
+  });
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+    if (process.platform !== "darwin") {
+      exec(`taskkill -F -IM node.exe`, exitApp);
+      function exitApp() {
+        app.quit();
+      }
     }
-  );
-  mainWindow.once("ready-to-show", () => mainWindow.show());
-  mainWindow.on("closed", () => (mainWindow = null));
+  });
 }
 
-app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
+function createServerTray() {
+  secondWindow = new BrowserWindow({
+    width: 900,
+    height: 680,
+    show: false,
+    // title must be different than main window
+    title: "server",
+    webPreferences: {
+      nodeIntegration: true,
+      preload: path.join(__dirname, "preload.js"),
+    },
+  });
 
-app.on("ready", createWindow);
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    exec(`taskkill -F -IM node.exe`, exitApp);
-    function exitApp() {
-      app.quit();
-    }
-  }
-});
-app.on("activate", () => {
-  if (mainWindow === null) {
-    createWindow();
-  }
+  secondWindow.loadFile("server/index.html");
+  tray = new Tray(iconPath);
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Close server",
+      click: () => {
+        exec(`taskkill -F -IM node.exe`, exitApp);
+        function exitApp() {
+          app.quit();
+        }
+      },
+    },
+  ]);
+  tray.setToolTip("PI Command Center - server");
+  tray.setContextMenu(contextMenu);
+}
+
+app.on("ready", () => {
+  setTimeout(() => {
+    // time out to give server to load data
+    createMainWindow();
+  }, 3000);
+  createServerTray();
 });

@@ -7,8 +7,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [ips, setIps] = useState([]);
-
   useEffect(() => {
     axios
       .get("http://localhost:3007/api/v1/users")
@@ -22,16 +20,8 @@ function App() {
       });
   }, []);
 
-  useEffect(() => {
-    axios
-      // this is from a separated server, not included in this repo
-      // when i run that server (3002) you can fetch data correctly
-      .get("http://localhost:3002/logger/get-all-instances")
-      .then((res) => setIps(res.data));
-  }, []);
-
-  // if (loading) return <p>Loading...</p>;
-  // if (error) return <p>Error! server not found</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error! server not found</p>;
 
   return (
     <div className="App">
@@ -40,12 +30,6 @@ function App() {
           <p>
             {item.name} {item.lastName}
           </p>
-        </div>
-      ))}
-
-      {ips.map((ip) => (
-        <div key={ip}>
-          <p>{ip}</p>
         </div>
       ))}
     </div>
