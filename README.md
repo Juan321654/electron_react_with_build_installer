@@ -1,3 +1,9 @@
+cd to root folder `npm i`
+
+`npm run start`
+
+`npm run build`
+
 `master` branch status: working
 
 `server` branch status: working (not when installed, only when launch from dist icon)
