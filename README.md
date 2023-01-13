@@ -1,3 +1,7 @@
+server with sequelize not working yet, but was able to make in the `preload.js` an internal express server which works 
+
+possible fix: in `preload.js` somehow add server > index.js to be able to run the server
+
 cd to root folder `npm i`
 
 `npm run start`
