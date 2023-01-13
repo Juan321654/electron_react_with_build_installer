@@ -4,7 +4,15 @@
   "description": "this is an electron build test",
   "author": "Juan Camacho",
   "build": {
-    "appId": "com.electron.electron_with_installer_react"
+    "appId": "com.electron.electron_with_installer_react",
+    "extraResources": {
+      "from": "server",
+      "to": "server"
+    },
+    "files": [
+      "server/**/*",
+      "**/*"
+    ]
   },
   "main": "public/electron.js",
   "homepage": "./",
