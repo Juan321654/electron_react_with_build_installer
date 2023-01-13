@@ -17,4 +17,12 @@ router.get("/users", async (req, res) => {
   }
 });
 
+router.post("/users", async (req, res) => {
+  const user = await User.create({
+    name: req.body.name,
+    lastName: req.body.lastName,
+  });
+  return res.send(user);
+});
+
 module.exports = router;
