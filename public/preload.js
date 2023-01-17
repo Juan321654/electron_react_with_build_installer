@@ -6,7 +6,7 @@ exec(`npm run start-server`);
 
 const express = require('express');
 const app = express();
-const port = 3007;
+const port = 3008;
 app.use(express.json());
 
 app.get('/', (req, res) => res.send('Hello World!'));
